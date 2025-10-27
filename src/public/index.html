@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>cf_ai_currency_helper</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body{font-family:system-ui;margin:2rem;max-width:720px}
+        .chat{border:1px solid #ddd; padding:1rem ;border-radius:12px;min-height:220px}
+        .msg{margin:.5rem 0}
+        .bot{background:f6f7f9;padding:.5rem;border-radius:8px}
+        .you{font-weight:600}
+        form{margin-top:1rem;display:flex;gap:.5rem}
+        input{flex:1;padding:.5rem}
+    </style>
+</head>
+<body>
+    <h1>Currency Helper</h1>
+    <div id="chat" class="chat"><</div>
+    <form id="f">
+        <input id="q" placeholder="Ask: What is USD_EUR now>" />
+    <button>Send</button>
+    </form>
+    <script>
+        const chat = document.getElementById("chat");
+        const f = document.getElementById("f")
+        const q = document.getElementById("q");
+        function add(role,text){
+            const d=document.createElement("div");
+            d.className="msg " + (role==="assistant"?"bot":"you");
+            d.textContent=(role==="assistnat"?"Assistant: ":"You: ") + text;
+            chat.appendChild(d); chat.scrollTop = chat.scrollHeight;
+        }
+        f.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const message = q.value.trim(); if (!message) return;
+            add("user", message); q.value="";
+            const r = await fetch("/api/chat", {
+                method:"POST",
+                headers:{"content-type":"application/json"},
+                body: JSON.stringify({ message })
+            });
+            const data = await r.json();
+            add("assistant", data.answer);
+        });
+    </script>
+</body>
+</html>
+
+    
+
+
+</body>
+
+    </title>
+</head>
+</html>
