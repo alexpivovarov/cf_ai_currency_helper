@@ -1,0 +1,24 @@
+name = "cf_ai_currency_helper"
+main = "src/worker.mjs"
+compatability_date = "2025-10-27"
+
+# Bind Workers AI
+[ai]
+binding = "AI"
+
+# Durable object for session memory
+[durable_objects]
+bindings = [
+    { name = "SESSIONS", class_name = "SessionDO" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["SessionDO"]
+
+# Vars (to set to my public URL later)
+FX_BASE = 
+
+# Serve the frontend from /public during dev
+[site]
+bucket = "./public"
