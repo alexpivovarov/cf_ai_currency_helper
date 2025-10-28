@@ -1,5 +1,6 @@
 // src/worker.mjs
 import { extractPairs, fetchFromFrankfurter } from "./fx.js";
+export { SessionDO } from "./session-do.mjs";
 
 export default {
   async fetch(req, env) {
@@ -8,12 +9,18 @@ export default {
     if (url.pathname === "/health") return new Response("ok");
 
     if (url.pathname === "/api/chat" && req.method === "POST") {
-      const { sessionId = "anon", message = "" } = await req.json();
+        const { sessionId = "anon", message = "" } = await req.json();
 
-      // 1) parse pairs mentioned by the user
-      const pairs = extractPairs(message);
-      // 2) fetch live rates from Frankfurter
-      const rates = pairs.length ? await fetchFromFrankfurter(pairs) : {};
+        // 1) parse pairs mentioned by the user
+        const pairs = extractPairs(message);
+        // 2) fetch live rates from Frankfurter
+        const rates = pairs.length ? await fetchFromFrankfurter(pairs) : {};
+
+        const id = env.SESSIONS.idFromName(sessionId);
+        const stub = env.SESSIONS.get(id);
+        // pull history
+        await stub.fetch("http://do", { method: "POST", body: JSON.stringify({ sessionId }) });
+        
 
         // AI block
         const sys = "You are a concise foreign exchange assistant. If the user asks about a pair, include the live rate provided.";
@@ -36,16 +43,23 @@ export default {
             aiAnswer = aiRes?.response || "";
         } catch (e) {
             console.error("Workers AI error:", e)
-            aiAnswer = ""; // fall back if AI has an issue
+            aiAnswer = ""; // fallback if AI has an issue
         }
 
-        // fallback text if AI returns nothing
+
+        // 5) fallback text if AI returns nothing
         const fallback = Object.keys(rates).length
             ? "Live rates:\n" + Object.entries(rates).map(([k,v]) => `${k}: ${v ?? "(no rate)"}`).join("\n")
             : "Ask me about a pair like USD_EUR.";
         
         const answer = aiAnswer || fallback;
 
+        // 6) Memory
+        await stub.fetch("http://do", { method:"POST", body: JSON.stringify({ sessionId, turn:{ role:"user", content: message, ts: Date.now() } }) });
+        await stub.fetch("http://do", { method:"POST", body: JSON.stringify({ sessionId, turn:{ role:"assistant", content: answer, ts: Date.now() } }) });
+
+
+        // 7) response
         return new Response(JSON.stringify({
             sessionId, answer, rates, fxMeta: { source: "frankfurter" }
             }), 
