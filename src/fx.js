@@ -29,5 +29,5 @@ export async function fetchFromFrankfurter(pairs) {
 export function extractPairs(text) {
   // Finds tokens like USD_EUR, EUR_GBP, GBP_USD, etc.
   return (text.toUpperCase().match(/\b[A-Z]{3}_[A-Z]{3}\b/g) || [])
-    .slice(0, 6); // keep it small
+    .slice(0, 6); 
 }
