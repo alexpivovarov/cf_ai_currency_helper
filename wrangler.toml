@@ -2,6 +2,8 @@ name = "cf_ai_currency_helper"
 main = "src/worker.mjs"
 compatibility_date = "2025-10-27"
 
+account_id = "726f102cb7ee58f4b18f7415a5952ab8"
+
 # Bind Workers AI
 [ai]
 binding = "AI"
