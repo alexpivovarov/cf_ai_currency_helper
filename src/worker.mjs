@@ -1,31 +1,32 @@
+// src/worker.mjs
+import { extractPairs, fetchFromFrankfurter } from "./fx.js";
+
 export default {
-    async fetch(req, env, ctx) {
-        const url = new URL(req.url);
+  async fetch(req, env) {
+    const url = new URL(req.url);
 
-        if (url.pathname === "/api/chat" && req.method === "POST") {
-            const { message = "" } = await req.json().catch(() => ({ meesage: ""}));
-            // Stub response for now; proves the path + CORS + JSON work
-            return json({ answer: `Stub reply: you said "${message}"` });
-        }
-
-        // Health for quick checks
     if (url.pathname === "/health") return new Response("ok");
 
-    // Anything else falls back to static asssets (Pages) durnig dev
-    return new Response("OK", { status: 200 });
+    if (url.pathname === "/api/chat" && req.method === "POST") {
+      const { sessionId = "anon", message = "" } = await req.json();
 
+      // 1) parse pairs mentioned by the user
+      const pairs = extractPairs(message);
+      // 2) fetch live rates from Frankfurter
+      const rates = pairs.length ? await fetchFromFrankfurter(pairs) : {};
+
+      // 3) simple AI-less reply for now (or pass `rates` as context to Workers AI)
+      const lines = pairs.length
+        ? pairs.map(p => `${p}: ${rates[p] ?? "(no rate)"}`).join("\n")
+        : "Ask me about a pair like USD_EUR.";
+      const answer = pairs.length ? `Live rates:\n${lines}` : lines;
+
+      return new Response(JSON.stringify({ sessionId, answer, pairs, rates, fxMeta: { source: "frankfurter" } }), {
+        headers: { "content-type": "application/json" }
+      });
     }
+
+    // serve /public
+    return env.ASSETS.fetch(req);
+  }
 };
-
-function json(data, status = 200) {
-    return new Response(JSON.stringify(data), {
-        status,
-        headers: { "content-type": "application/json"}
-    });
-}
-
-// Placeholder Durable Object
-export class SessionDO {
-    constructor(state, env) { this.state = state; this.env = env; }
-    async fetch(req) { return new Response("not-implemented", { status: 501}); }
-}
