@@ -33,10 +33,8 @@ It runs fully on the **Cloudflare edge**, uses **Durable Objects** for short-ter
 
 ---
 
-## 🧑‍💻 Setup & Run
-
+## Set up and run
 1️⃣ Clone & Install
-```bash
 git clone https://github.com/alexpivovarov/cf_ai_currency_helper.git
 cd cf_ai_currency_helper
 npm install
@@ -44,9 +42,11 @@ npm install
 2️⃣ Log into Cloudflare
 npx wrangler login
 
-3️⃣ Run remotely (recommended)
-npx wrangler dev
+If browser login does not work, use your own API token:
+export CLOUDFLARE_API_TOKEN="your_token_here"
 
+3️⃣ Run Remotely (Recommended)
+npx wrangler dev
 
 
 ---
