@@ -48,9 +48,10 @@ npx wrangler login
 npx wrangler dev
 
 
+
 ---
 
-Working prompts
+## Working prompts
 
 	•	“What is USD_EUR now?”
 	•	“Give me the latest EUR_GBP rate.”
@@ -59,4 +60,3 @@ Working prompts
 	•	“What’s the current JPY_USD exchange rate?”
 
 ---
-
