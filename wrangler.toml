@@ -19,3 +19,4 @@ new_classes = ["SessionDO"]
 # Serve the frontend from /public during dev
 [assets]
 directory = "src/public"
+binding = "ASSETS"
