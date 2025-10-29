@@ -1,9 +1,5 @@
 # Prompts Used During Development
 
-This document lists the main ChatGPT prompts and guidance used while developing cf_ai_currency_helper, a Cloudflare Worker project that integrates Workers AI and Durable Objects to provide live currency exchange rates via the Frankfurter API.
-
----
-
 ## Project Setup & Structure
 
 Prompt examples:
